@@ -1,3 +1,5 @@
 */build
 */.cache
 */src/__pycache__
+*/.cmake
+*/imgui.ini
