@@ -4,28 +4,31 @@
 
 #include <pybind11/pytypes.h>
 
+#include <typeinfo>
+
 #include "common.h"
 #include "internals.h"
 
-#include <typeinfo>
 
 PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 PYBIND11_NAMESPACE_BEGIN(detail)
 
 // Forward declaration needed here: Refactoring opportunity.
-extern "C" inline PyObject *pybind11_object_new(PyTypeObject *type, PyObject *, PyObject *);
+extern "C" inline PyObject *pybind11_object_new(PyTypeObject *type, PyObject *,
+                                                PyObject *);
 
 inline bool type_is_managed_by_our_internals(PyTypeObject *type_obj) {
 #if defined(PYPY_VERSION)
     auto &internals = get_internals();
-    return bool(internals.registered_types_py.find(type_obj)
-                != internals.registered_types_py.end());
+    return bool(internals.registered_types_py.find(type_obj) !=
+                internals.registered_types_py.end());
 #else
     return bool(type_obj->tp_new == pybind11_object_new);
 #endif
 }
 
-inline bool is_instance_method_of_type(PyTypeObject *type_obj, PyObject *attr_name) {
+inline bool is_instance_method_of_type(PyTypeObject *type_obj,
+                                       PyObject *attr_name) {
     PyObject *descr = _PyType_Lookup(type_obj, attr_name);
     return bool((descr != nullptr) && PyInstanceMethod_Check(descr));
 }
@@ -55,15 +58,16 @@ inline object try_get_cpp_conduit_method(PyObject *obj) {
     return reinterpret_steal<object>(method);
 }
 
-inline void *try_raw_pointer_ephemeral_from_cpp_conduit(handle src,
-                                                        const std::type_info *cpp_type_info) {
+inline void *try_raw_pointer_ephemeral_from_cpp_conduit(
+    handle src, const std::type_info *cpp_type_info) {
     object method = try_get_cpp_conduit_method(src.ptr());
     if (method) {
-        capsule cpp_type_info_capsule(const_cast<void *>(static_cast<const void *>(cpp_type_info)),
-                                      typeid(std::type_info).name());
-        object cpp_conduit = method(bytes(PYBIND11_PLATFORM_ABI_ID),
-                                    cpp_type_info_capsule,
-                                    bytes("raw_pointer_ephemeral"));
+        capsule cpp_type_info_capsule(
+            const_cast<void *>(static_cast<const void *>(cpp_type_info)),
+            typeid(std::type_info).name());
+        object cpp_conduit =
+            method(bytes(PYBIND11_PLATFORM_ABI_ID), cpp_type_info_capsule,
+                   bytes("raw_pointer_ephemeral"));
         if (isinstance<capsule>(cpp_conduit)) {
             return reinterpret_borrow<capsule>(cpp_conduit).get_pointer();
         }

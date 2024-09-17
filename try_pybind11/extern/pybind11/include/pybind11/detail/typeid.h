@@ -13,7 +13,7 @@
 #include <cstdlib>
 
 #if defined(__GNUG__)
-#    include <cxxabi.h>
+#include <cxxabi.h>
 #endif
 
 #include "common.h"
@@ -36,7 +36,8 @@ PYBIND11_NOINLINE void clean_type_id(std::string &name) {
 #if defined(__GNUG__)
     int status = 0;
     std::unique_ptr<char, void (*)(void *)> res{
-        abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status), std::free};
+        abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status),
+        std::free};
     if (status == 0) {
         name = res.get();
     }

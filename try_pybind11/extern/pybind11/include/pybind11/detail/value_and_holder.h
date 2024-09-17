@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "common.h"
-
 #include <cstddef>
 #include <typeinfo>
+
+#include "common.h"
+
 
 PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 PYBIND11_NAMESPACE_BEGIN(detail)
@@ -19,12 +20,16 @@ struct value_and_holder {
     void **vh = nullptr;
 
     // Main constructor for a found value/holder:
-    value_and_holder(instance *i, const detail::type_info *type, size_t vpos, size_t index)
-        : inst{i}, index{index}, type{type},
+    value_and_holder(instance *i, const detail::type_info *type, size_t vpos,
+                     size_t index)
+        : inst{i},
+          index{index},
+          type{type},
           vh{inst->simple_layout ? inst->simple_value_holder
                                  : &inst->nonsimple.values_and_holders[vpos]} {}
 
-    // Default constructor (used to signal a value-and-holder not found by get_value_and_holder())
+    // Default constructor (used to signal a value-and-holder not found by
+    // get_value_and_holder())
     value_and_holder() = default;
 
     // Used for past-the-end iterator
@@ -44,31 +49,37 @@ struct value_and_holder {
     bool holder_constructed() const {
         return inst->simple_layout
                    ? inst->simple_holder_constructed
-                   : (inst->nonsimple.status[index] & instance::status_holder_constructed) != 0u;
+                   : (inst->nonsimple.status[index] &
+                      instance::status_holder_constructed) != 0u;
     }
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void set_holder_constructed(bool v = true) {
         if (inst->simple_layout) {
             inst->simple_holder_constructed = v;
         } else if (v) {
-            inst->nonsimple.status[index] |= instance::status_holder_constructed;
+            inst->nonsimple.status[index] |=
+                instance::status_holder_constructed;
         } else {
-            inst->nonsimple.status[index] &= (std::uint8_t) ~instance::status_holder_constructed;
+            inst->nonsimple.status[index] &=
+                (std::uint8_t)~instance::status_holder_constructed;
         }
     }
     bool instance_registered() const {
         return inst->simple_layout
                    ? inst->simple_instance_registered
-                   : ((inst->nonsimple.status[index] & instance::status_instance_registered) != 0);
+                   : ((inst->nonsimple.status[index] &
+                       instance::status_instance_registered) != 0);
     }
     // NOLINTNEXTLINE(readability-make-member-function-const)
     void set_instance_registered(bool v = true) {
         if (inst->simple_layout) {
             inst->simple_instance_registered = v;
         } else if (v) {
-            inst->nonsimple.status[index] |= instance::status_instance_registered;
+            inst->nonsimple.status[index] |=
+                instance::status_instance_registered;
         } else {
-            inst->nonsimple.status[index] &= (std::uint8_t) ~instance::status_instance_registered;
+            inst->nonsimple.status[index] &=
+                (std::uint8_t)~instance::status_instance_registered;
         }
     }
 };
