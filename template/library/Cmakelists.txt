@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.20)
+
+project(helper CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+
+add_subdirectory(extern/glfw)
+
+include_directories(
+    third_party/include/imgui
+    third_party/include/imgui/backends
+    src
+    tests
+    extern/glfw/include
+)
+
+file(GLOB_RECURSE SRC third_party/include/*.cpp)
+
+add_library(helper ${SRC} src/helper.cpp)
+
+target_link_libraries(helper PRIVATE glfw opengl32)
+
+add_executable(imgui tests/main.cpp)
+
+target_link_libraries(imgui PRIVATE helper)
