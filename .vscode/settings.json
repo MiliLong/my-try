@@ -2,8 +2,8 @@
     "editor.folding": true,
     "editor.foldingStrategy": "auto",
     "editor.foldingHighlight": true,
-    "editor.fontSize": 16, // 编辑器中的字体大小
-    "editor.inlayHints.fontSize": 16, // 编辑器中内嵌提示的字体大小
+    "editor.fontSize": 18, // 编辑器中的字体大小
+    "editor.inlayHints.fontSize": 18, // 编辑器中内嵌提示的字体大小
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true, // 保存或者粘贴前自动格式化
     "terminal.integrated.enableMultiLinePasteWarning": "never", // 去除粘贴多行时警告
@@ -21,10 +21,4 @@
     }, // 用于指定如何运行不同语言的代码
     "code-runner.executorMapByFileExtension": {}, // 用于指定如何运行特定文件扩展名的代码
     "clangd.path": "C:/msys64/mingw64/bin/clangd.exe",
-    "cmake.generator": "Visual Studio 17 2022",
-    "cmake.configureArgs": [
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
-    ],
-    "cmake.buildDirectory": "C:/Users/MILI/Desktop/Problems/my-try/try_pybind11/build",
-    "cmake.sourceDirectory": "C:/Users/MILI/Desktop/Problems/my-try/try_pybind11",
 }
