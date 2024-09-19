@@ -4,15 +4,15 @@ project(imgui CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(extern/glfw)
+add_subdirectory(third_party/glfw)
 
 include_directories(
-    third_party/include/imgui
-    third_party/include/imgui/backends
+    third_party/imgui
+    third_party/imgui/backends
     src
 )
 
-file(GLOB_RECURSE SRC third_party/include/*.cpp src/*.cpp)
+file(GLOB_RECURSE SRC third_party/imgui/*.cpp src/*.cpp)
 
 add_executable(imgui ${SRC})
 

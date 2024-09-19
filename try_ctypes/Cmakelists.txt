@@ -4,27 +4,18 @@ project(libimgui CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_SHARED_LINKER_FLAGS "-static")
+add_subdirectory(third_party/glfw)
 
 include_directories(
-    third_party/include
-    third_party/include/GLFW
-    third_party/include/imgui
-    third_party/include/imgui/backends
+    third_party
+    third_party/imgui
+    third_party/imgui/backends
     src
 )
 
-link_directories(
-    third_party/lib
-)
+file(GLOB_RECURSE SRC third_party/imgui/*.cpp src/*.cpp)
 
-file(GLOB_RECURSE SRC third_party/include/*.cpp src/*.cpp)
+add_library(imgui SHARED ${SRC})
 
-add_library(LIB SHARED ${SRC})
-
-set_target_properties(LIB PROPERTIES
-    OUTPUT_NAME "imgui"
-)
-
-target_link_libraries(LIB libglfw3.a opengl32.dll)
+target_link_libraries(imgui PRIVATE glfw opengl32)
 

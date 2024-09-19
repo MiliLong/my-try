@@ -4,17 +4,17 @@ project(helper CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(extern/glfw)
+add_subdirectory(third_party/glfw)
 
 include_directories(
-    third_party/include/imgui
-    third_party/include/imgui/backends
+    third_party/imgui
+    third_party/imgui/backends
     src
     tests
-    extern/glfw/include
+    third_party/glfw/include
 )
 
-file(GLOB_RECURSE SRC third_party/include/*.cpp)
+file(GLOB_RECURSE SRC third_party/imgui/*.cpp)
 
 add_library(helper ${SRC} src/helper.cpp)
 
