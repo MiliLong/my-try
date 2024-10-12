@@ -11,11 +11,16 @@ include_directories(
     third_party
     third_party/imgui
     third_party/imgui/backends
+    third_party/glfw/include
     src
 )
 
-file(GLOB_RECURSE SRC third_party/*.cpp src/*.cpp src/*.c)
+file(GLOB_RECURSE IMGUI_SRC third_party/imgui/*.cpp third_party/imgui/backends/*.cpp)
+
+add_library(imgui ${IMGUI_SRC})
+
+file(GLOB_RECURSE SRC src/*.cpp src/*.c)
 
 add_executable(OpenGL ${SRC})
 
-target_link_libraries(OpenGL PRIVATE glfw opengl32)
+target_link_libraries(OpenGL PRIVATE glfw imgui opengl32)

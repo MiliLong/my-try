@@ -1,13 +1,18 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
-
-GLFWwindow* helpGlfwCreateWindow(int width, int height, const char* title,
-                                 int interval);
-void helpGladLoadGLLoader();
+void* helpGlfwCreateWindow(int width, int height, const char* title,
+                           int interval);
 void helpImguiInit();
-void helpSetupBackends(GLFWwindow* window, const char* glsl_version);
-void helpCleanup(GLFWwindow* window);
+void helpSetupBackends(void* window, const char* glsl_version);
+void helpCleanup(void* window);
 void helpFrameStart();
-void helpFrameEnd(GLFWwindow* window);
+void helpFrameEnd(void* window);
 void helpViewportsEnable();
+
+int helpGlfwWindowShouldClose(void* window);
+void helpDockSpaceOverViewport();
+void helpRender();
+
+void helpSetWindowAlwaysOnTop(void* window);
+
+void helpGladLoadGLLoader();

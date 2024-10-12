@@ -1,37 +1,101 @@
-#ifndef HEAD
-#include "glad/glad.h"
-#endif
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "gui.h"
-#include "imgui.h"
 
-void drawGui() {
-    ImGui::Begin("OpenGL Square");
+#include <cstdint>
 
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    float width = ImGui::GetContentRegionAvail().x;
-    float height = ImGui::GetContentRegionAvail().y;
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <windows.h>
 
-    ImVec2 top_left = ImVec2(p.x + 50, p.y + 50);
-    ImVec2 bottom_right = ImVec2(top_left.x + 200, top_left.y + 200);
+#include <glm/geometric.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(top_left.x, top_left.y, 0.0f));
-    model = glm::scale(model, glm::vec3(bottom_right.x - top_left.x,
-                                        bottom_right.y - top_left.y, 1.0f));
+#include "helper.h"
 
-    glEnable(GL_SCISSOR_TEST);
-    glScissor((GLint)top_left.x, (GLint)(height - bottom_right.y),
-              (GLint)(bottom_right.x - top_left.x),
-              (GLint)(bottom_right.y - top_left.y));
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDisable(GL_SCISSOR_TEST);
+// 设置窗口为分层并透明
+void helpSetWindowTransparent(void *window) {
+    HWND hwnd = glfwGetWin32Window((GLFWwindow *)window);
+    LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+    exStyle |= WS_EX_LAYERED;  // 添加分层样式
+    SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
 
-    draw_list->AddRectFilled(top_left, bottom_right, IM_COL32(255, 0, 0, 255));
+    // 设置透明度，完全透明
+    SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 25, LWA_COLORKEY);
+}
 
-    ImGui::Text("This is an example of rendering a square.");
-    ImGui::End();
+// 设置窗口支持点击穿透
+void SetWindowClickThrough(void *window) {
+    HWND hwnd = glfwGetWin32Window((GLFWwindow *)window);
+    LONG exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+    exStyle |= WS_EX_TRANSPARENT | WS_EX_NOACTIVATE;  // 添加点击穿透样式
+    SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
+}
+
+int idx = 0;
+void *p[1000];
+
+void drawGui(GLFWwindow *window) {
+    static bool main_open = true;
+
+    if (main_open) {
+        ImGui::Begin("Demo", &main_open, ImGuiWindowFlags_NoDocking);
+        ImGui::Text("hello world!");
+        ImGui::Text("你好世界！");
+        ImGui::Text("%.2f FPS", ImGui::GetIO().Framerate);
+
+        static float x[3] = {1, 1, 1};
+
+        ImGui::SliderFloat3("x", x, 0, 10);
+
+        static float y[3] = {1, 1, 1};
+
+        ImGui::SliderFloat3("y", y, 0, 10);
+
+        glm::vec3 X = glm::make_vec3(x);
+        glm::vec3 Y = glm::make_vec3(y);
+
+        glm::vec3 add = X + Y;
+
+        ImGui::Text("x + y = %.3f %.3f %.3f", add.x, add.y, add.z);
+
+        glm::vec3 mul = glm::cross(X, Y);
+
+        ImGui::Text("x cross y = %.3f %.3f %.3f", mul.x, mul.y, mul.z);
+
+        ImGuiContext *g = ImGui::GetCurrentContext();
+
+        static auto id2 = ImGui::GetWindowViewport()->ID;
+        ImGui::Text("Viewport ID: %d", ImGui::GetWindowViewport()->ID);
+
+        ImGui::Begin("one");
+
+        static auto id1 = ImGui::GetWindowViewport()->ID;
+        ImGui::Text("Viewport ID: %d", ImGui::GetWindowViewport()->ID);
+        ImGui::Text("%.2f FPS", ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        for (int i = 0; i < g->Viewports.size(); i++) {
+            ImGuiViewportP *viewport = g->Viewports[i];
+            if (viewport->PlatformHandle != nullptr && viewport->ID == id1) {
+                bool exists = false;
+
+                for (int i = 0; i < idx; i++) {
+                    if (p[i] == viewport->PlatformHandle) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    p[idx++] = viewport->PlatformHandle;
+                }
+            }
+        }
+        ImGui::End();
+
+    } else {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
 }
